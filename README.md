@@ -13,9 +13,10 @@ user can customize it adding more nodes or naming something else, example:
 minikube start --nodes $NODE_NUMBER  -p $PROFILE_NAME
 ```
 
-And enable ingress access to the minikube
+And enable ingress and metrics server
 ```
 minikube addons enable ingress
+minikube addons enable metrics-server
 ```
 
 After that deploy kube-prometheus-stack
