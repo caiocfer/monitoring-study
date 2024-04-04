@@ -10,7 +10,7 @@ To start this project, first start a minikube cluster
 Minikube start
 user can customize it adding more nodes or naming something else, example:
 
-minikube start --nodes $NODE_NUMBER  -p $PROFILE_NAME
+minikube start --nodes $NODE_NUMBER  -p $PROFILE_NAME --container-runtime=containerd
 ```
 
 And enable ingress and metrics server
@@ -24,6 +24,7 @@ After that deploy kube-prometheus-stack
 ```
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
+helm install prom-operator prometheus-community/kube-prometheus-stack
 ```
 
 When all pods are up and running, the user can the deploy the ingress found in this repo, changing the ip address from the yaml to the one the user got from the command "minikube ip".
