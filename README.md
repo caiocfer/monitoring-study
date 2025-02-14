@@ -19,12 +19,24 @@ minikube addons enable ingress
 minikube addons enable metrics-server
 ```
 
+Create namespaces
+```
+kubectl create ns monitoring
+```
+
 After that deploy kube-prometheus-stack
 
 ```
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
-helm install prom-operator prometheus-community/kube-prometheus-stack
+helm install prom-operator prometheus-community/kube-prometheus-stack -f overrides/prometheus-override.yaml --namespace=monitoring
+```
+
+Install fluentbit
+```
+helm repo add fluent https://fluent.github.io/helm-charts
+helm repo update
+helm install fluentbit fluent/fluent-bit-operator -f overrides/fluentbit-override.yaml --namespace=monitoring
 ```
 
 When all pods are up and running, the user can the deploy the ingress found in this repo, changing the ip address from the yaml to the one the user got from the command "minikube ip".

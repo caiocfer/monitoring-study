@@ -1,0 +1,73 @@
+serviceAccount:
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/path: "/api/v1/metrics"
+    prometheus.io/port: "2020"
+
+config:
+  service: |
+    [SERVICE]
+        Daemon Off
+        Flush {{ .Values.flush }}
+        Log_Level {{ .Values.logLevel }}
+        Parsers_File /fluent-bit/etc/parsers.conf
+        Parsers_File /fluent-bit/etc/conf/custom_parsers.conf
+        HTTP_Server On
+        HTTP_Listen 0.0.0.0
+        HTTP_Port {{ .Values.metricsPort }}
+        Health_Check On
+
+  ## https://docs.fluentbit.io/manual/pipeline/inputs
+  inputs: |
+    [INPUT]
+        name            node_exporter_metrics
+        tag             node_metrics
+        scrape_interval 2
+
+    [INPUT]
+        Name tail
+        Path /var/log/containers/*.log
+        multiline.parser docker, cri
+        Tag kube.*
+        Mem_Buf_Limit 5MB
+        Skip_Long_Lines On
+
+    [INPUT]
+        Name systemd
+        Tag host.*
+        Systemd_Filter _SYSTEMD_UNIT=kubelet.service
+        Read_From_Tail On
+
+    [INPUT]
+        name prometheus_scrape
+        host telegraf-telegraf-ds.telegraf.svc.cluster.local
+        port 9273
+        tag telegraf_metrics
+        metrics_path /metrics
+        scrape_interval 10s
+
+  ## https://docs.fluentbit.io/manual/pipeline/filters
+  filters: |
+    [FILTER]
+        Name kubernetes
+        Match kube.*
+        Merge_Log On
+        Keep_Log Off
+        K8S-Logging.Parser On
+        K8S-Logging.Exclude On
+    
+    [FILTER]
+        Name record_modifier
+        Match *
+        Record test_key "test_value"
+
+  ## https://docs.fluentbit.io/manual/pipeline/outputs
+  outputs: |
+    [OUTPUT]
+        name            prometheus_exporter
+        match           *
+        host            0.0.0.0
+        port            2020
+        add_label       app fluent-bit
+        add_label       environment production
+        add_label       cool_host ${HOSTNAME}
