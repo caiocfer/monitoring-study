@@ -1,0 +1,14 @@
+apiVersion: fluentbit.fluent.io/v1alpha2
+kind: ClusterInput
+metadata:
+  name: telegraf-metrics
+  namespace: fluentbit
+  labels:
+    fluentbit.fluent.io/enabled: "true"  
+spec:
+  prometheusScrapeMetrics:
+    tag: telegraf_metrics
+    host: telegraf-telegraf-ds.telegraf.svc.cluster.local
+    port: 9273
+    metricsPath: /metrics
+    scrapeInterval: 10s

@@ -1,0 +1,15 @@
+apiVersion: fluentbit.fluent.io/v1alpha2
+kind: ClusterOutput
+metadata:
+  name: prometheus-exporter
+  namespace: fluentbit
+  labels:
+    fluentbit.fluent.io/enabled: "true"
+spec:
+  match: "*"
+  prometheusExporter:
+    host: "0.0.0.0"
+    port: 2020
+    addLabels:
+      app: "fluentbit"
+      oloco: "meu"

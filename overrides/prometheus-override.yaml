@@ -1,14 +1,15 @@
 prometheus:
   prometheusSpec:
     additionalScrapeConfigs:
-#      - job_name: 'loki'
-#        static_configs:
-#          - targets: ['loki.monitoring.svc.cluster.local:3100']
       - job_name: 'namespace-monitoring'
         kubernetes_sd_configs:
           - role: pod
             namespaces:
               names:
-                - telegraf
                 - monitoring
-
+      - job_name: 'fluentbit'
+        kubernetes_sd_configs:
+          - role: pod
+            namespaces:
+              names:
+                - fluentbit
