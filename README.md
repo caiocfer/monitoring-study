@@ -40,6 +40,13 @@ kubectl apply -f fluentbit/exporter.yaml
 kubectl apply -f fluentbit/telegraf.yaml
 ```
 
+Install loki
+```
+helm repo add fluent https://fluent.github.io/helm-charts
+helm repo update
+helm install --values overrides/loki-override.yaml loki grafana/loki --namespace=monitoring
+```
+
 When all pods are up and running, the user can the deploy the ingress found in this repo, changing the ip address from the yaml to the one the user got from the command "minikube ip".
 
 ```

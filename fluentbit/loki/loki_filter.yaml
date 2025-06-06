@@ -1,0 +1,20 @@
+apiVersion: fluentbit.fluent.io/v1alpha2
+kind: ClusterFilter
+metadata:
+  name: promote-kubernetes-fields
+  labels:
+    fluentbit.fluent.io/enabled: "true"
+spec:
+  match: "kube.*"
+  filters:
+    - modify:
+        rules:
+          - copy:
+              key: kubernetes.pod_name
+              new_key: pod_name
+          - copy:
+              key: kubernetes.namespace_name
+              new_key: namespace_name
+          - copy:
+              key: kubernetes.container_name
+              new_key: container_name

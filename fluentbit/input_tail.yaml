@@ -1,0 +1,23 @@
+apiVersion: fluentbit.fluent.io/v1alpha2
+kind: ClusterInput
+metadata:
+  name: tail
+  labels:
+    fluentbit.fluent.io/enabled: "true"
+    fluentbit.fluent.io/component: logging
+spec:
+  tail:
+    tag: kube.*
+    path: "/var/log/containers/*.log"
+    readFromHead: True
+    parser: docker  # Adjust parser based on your container runtime (docker, cri, crio)
+    multilineParser: "docker, cri"
+    refreshIntervalSeconds: 10
+    memBufLimit: 5MB
+    bufferMaxSize: "50MB"
+    bufferChunkSize: "1MB"
+    skipLongLines: True
+    db: /fluent-bit/tail/pos.db
+    dbSync: Normal
+    storageType: "filesystem"
+    pauseOnChunksOverlimit: "on"

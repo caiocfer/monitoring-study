@@ -15,3 +15,28 @@ fluentbit:
       scrapeInterval: "2"
       scrapeOnStart: true
       tag: "fb.metrics"
+    tail:
+      enable: true
+      refreshIntervalSeconds: 10
+      memBufLimit: 100MB
+      bufferMaxSize: ""
+      bufferChunkSize: ""
+      path: "/var/log/containers/*.log"
+      skipLongLines: true
+      readFromHead: false
+      # Use storageType as "filesystem" if you want to use filesystem as the buffering mechanism for tail input.
+      storageType: memory
+      pauseOnChunksOverlimit: "off"
+      # multiline.parser
+      multilineParser: "docker, cri"
+    systemd:
+      enable: true
+      systemdFilter:
+        enable: true
+        filters: []
+      path: "/var/log/journal"
+      includeKubelet: true
+      stripUnderscores: "off"
+      # Use storageType as "filesystem" if you want to use filesystem as the buffering mechanism for systemd input.
+      storageType: memory
+      pauseOnChunksOverlimit: "off"
