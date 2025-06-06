@@ -1,0 +1,12 @@
+grafana:
+  env:
+    GF_SERVER_ROOT_URL: http://192.168.58.2.nip.io/grafana
+    GF_SERVER_SERVE_FROM_SUB_PATH: "true"
+  ingress:
+    enabled: true
+    path: /grafana
+    pathType: Prefix
+  additionalDataSources:
+    - name: loki
+      url: http://loki.monitoring.svc.cluster.local:3100
+      type: loki

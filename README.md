@@ -14,57 +14,61 @@ minikube start --nodes $NODE_NUMBER  -p $PROFILE_NAME --container-runtime=contai
 ```
 
 And enable ingress and metrics server
+
 ```
 minikube addons enable ingress
 minikube addons enable metrics-server
 ```
 
+Before moving on, let's overwrite the IP from our Ingress to our minikube ip
+```
+sed -i "s/[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+\.nip\.io/$(minikube ip).nip.io/g" overrides/grafana-override.yaml
+```
+
+Let's add all Helm Charts that we are going to need
+```
+#Kube-prometheus-stack
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo add fluent https://fluent.github.io/helm-charts
+helm repo add loki https://grafana.github.io/helm-charts
+helm repo update
+```
+
 After that deploy kube-prometheus-stack
 
 ```
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm repo update
-helm install prom-operator prometheus-community/kube-prometheus-stack -f overrides/prometheus-override.yaml --namespace=monitoring --create-namespace
+helm install prom-operator prometheus-community/kube-prometheus-stack -f overrides/prometheus-override.yaml -f overrides/grafana-override.yaml --namespace=monitoring --create-namespace
 ```
 
 Install fluentbit
+
 ```
-helm repo add fluent https://fluent.github.io/helm-charts
-helm repo update
 helm upgrade --install fluent-operator fluent/fluent-operator --namespace=fluentbit --create-namespace -f overrides/fluentbit-override.yaml 
 ```
 
 Add CRs
+
 ```
-kubectl apply -f fluentbit/exporter.yaml
-kubectl apply -f fluentbit/telegraf.yaml
+kubectl apply -f fluentbit/
 ```
 
 Install loki
+
 ```
-helm repo add fluent https://fluent.github.io/helm-charts
-helm repo update
 helm install --values overrides/loki-override.yaml loki grafana/loki --namespace=monitoring
+
+#Apply all crds
+kubectl apply -f fluentbit/loki/
 ```
 
-When all pods are up and running, the user can the deploy the ingress found in this repo, changing the ip address from the yaml to the one the user got from the command "minikube ip".
-
-```
-minikube ip
-```
-
-or the user can run this command to make this change automatically
-
-```
-sed -i "s/[0-9]\+\.[0-9]\+\.[0-9]\+\.[0-9]\+\.nip\.io/$(minikube ip).nip.io/g" grafana-ingress.yaml
-```
 Access the grafana dashboard using the minikube ip
 
 ```
-<minikube-ip>.nip.io
+<minikube-ip>.nip.io/grafana
 ```
 
 The default user/pass for this grafana deploy is
+
 ```
 admin
 prom-operator

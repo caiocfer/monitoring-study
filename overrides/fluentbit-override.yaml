@@ -19,15 +19,13 @@ fluentbit:
       enable: true
       refreshIntervalSeconds: 10
       memBufLimit: 100MB
-      bufferMaxSize: ""
-      bufferChunkSize: ""
+      bufferMaxSize: "50MB"
+      bufferChunkSize: "1MB"
       path: "/var/log/containers/*.log"
       skipLongLines: true
-      readFromHead: false
-      # Use storageType as "filesystem" if you want to use filesystem as the buffering mechanism for tail input.
+      readFromHead: true
       storageType: memory
-      pauseOnChunksOverlimit: "off"
-      # multiline.parser
+      pauseOnChunksOverlimit: "on"
       multilineParser: "docker, cri"
     systemd:
       enable: true
@@ -37,6 +35,5 @@ fluentbit:
       path: "/var/log/journal"
       includeKubelet: true
       stripUnderscores: "off"
-      # Use storageType as "filesystem" if you want to use filesystem as the buffering mechanism for systemd input.
       storageType: memory
       pauseOnChunksOverlimit: "off"
